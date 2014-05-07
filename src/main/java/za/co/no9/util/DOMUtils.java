@@ -68,7 +68,11 @@ public class DOMUtils {
         }
 
         public String toString() {
-            return element.getAttribute(attributeName);
+            if (element.hasAttribute(attributeName)) {
+                return element.getAttribute(attributeName);
+            } else {
+                throw new IllegalArgumentException("Unknown attribute " + attributeName + " on node " + element.getNodeName() + ".");
+            }
         }
     }
 }

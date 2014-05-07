@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class DOMUtilsTest {
     public static final String XML_STRING = "<xml attr1='AttrA' attr2='AttrB'><p>Hello</p><p>World</p></xml>";
@@ -16,10 +17,18 @@ public class DOMUtilsTest {
     }
 
     @Test
-    public void should_get_valid_attribute() throws Exception {
+    public void should_get_valid_attribute_simple_case() throws Exception {
         assertEquals("AttrA", DOMUtils
                 .from(XML_STRING)
                 .attribute("attr1")
+                .toString());
+    }
+
+    @Test(expected = java.lang.IllegalArgumentException.class)
+    public void should_throw_an_exception_if_attempting_to_access_an_attribute_that_does_not_exist() throws Exception {
+        assertNull(DOMUtils
+                .from(XML_STRING)
+                .attribute("attrX")
                 .toString());
     }
 }
