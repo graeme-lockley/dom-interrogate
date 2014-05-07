@@ -31,4 +31,28 @@ public class DOMUtilsTest {
                 .attribute("attrX")
                 .toString());
     }
+
+    @Test
+    public void should_return_a_default_value_if_attribute_does_not_exist() throws Exception {
+        assertEquals("My Value", DOMUtils
+                .from(XML_STRING)
+                .attribute("attrX")
+                .ifNullDefault("My Value")
+                .toString());
+    }
+
+    @Test
+    public void should_return_a_default_int_value_if_attribute_does_not_exist() throws Exception {
+        assertEquals("123", DOMUtils
+                .from(XML_STRING)
+                .attribute("attrX")
+                .ifNullDefault(123)
+                .toString());
+
+        assertEquals(123, DOMUtils
+                .from(XML_STRING)
+                .attribute("attrX")
+                .ifNullDefault(123)
+                .toInteger().intValue());
+    }
 }

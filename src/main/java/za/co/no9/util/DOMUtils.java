@@ -48,30 +48,74 @@ public class DOMUtils {
         }
     }
 
-    public abstract static class AttributeDSL {
-        public static AttributeDSL create(Element element, String attributeName) {
-            return new AttributeElementDSL(element, attributeName);
-        }
-
-        public abstract String toString();
-    }
-
-    public static class AttributeElementDSL extends AttributeDSL {
+    public static class AttributeDSL {
         private final Element element;
         private final String attributeName;
+        private Optional<Object> defaultValue;
 
-        public AttributeElementDSL(Element element, String attributeName) {
+        private AttributeDSL(Element element, String attributeName) {
             super();
 
             this.element = element;
             this.attributeName = attributeName;
         }
 
+        public static AttributeDSL create(Element element, String attributeName) {
+            return new AttributeDSL(element, attributeName);
+        }
+
+        @Override
         public String toString() {
+            Object resultObj = toObject();
+            return resultObj == null ? null : resultObj.toString();
+        }
+
+        protected Object toObject() {
             if (element.hasAttribute(attributeName)) {
                 return element.getAttribute(attributeName);
-            } else {
+            } else if (defaultValue == null) {
                 throw new IllegalArgumentException("Unknown attribute " + attributeName + " on node " + element.getNodeName() + ".");
+            } else if (defaultValue.isPresent()) {
+                return defaultValue.get();
+            } else {
+                return null;
+            }
+        }
+
+        public AttributeDSL ifNullDefault(String defaultValue) {
+            this.defaultValue = Optional.<Object>ofNullable(defaultValue);
+            return this;
+        }
+
+        public AttributeIntDSL ifNullDefault(Integer defaultValue) {
+            this.defaultValue = Optional.<Object>ofNullable(defaultValue);
+            return new AttributeIntDSL(this);
+        }
+    }
+
+    public static class AttributeIntDSL {
+        private final AttributeDSL attributeDSL;
+
+        public AttributeIntDSL(AttributeDSL attributeDSL) {
+            this.attributeDSL = attributeDSL;
+        }
+
+        @Override
+        public String toString() {
+            Integer result = toInteger();
+
+            return result == null ? null : result.toString();
+        }
+
+        public Integer toInteger() {
+            Object resultObj = attributeDSL.toObject();
+
+            if (resultObj == null) {
+                return null;
+            } else if (resultObj instanceof Integer) {
+                return (Integer) resultObj;
+            } else {
+                return Integer.parseInt(resultObj.toString());
             }
         }
     }
