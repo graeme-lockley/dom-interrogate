@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>za.co.no9</groupId>
-    <artifactId>dom-interogate</artifactId>
+    <artifactId>dom-interrogate</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>dom-interrogate</name>
