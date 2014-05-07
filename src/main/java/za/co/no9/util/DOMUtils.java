@@ -1,5 +1,6 @@
 package za.co.no9.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -52,10 +53,9 @@ public class DOMUtils {
         private final Element element;
         private final String attributeName;
         private Optional<Object> defaultValue;
+        private Optional<String> blankValue;
 
         private AttributeDSL(Element element, String attributeName) {
-            super();
-
             this.element = element;
             this.attributeName = attributeName;
         }
@@ -67,29 +67,46 @@ public class DOMUtils {
         @Override
         public String toString() {
             Object resultObj = toObject();
-            return resultObj == null ? null : resultObj.toString();
+            return resultObj == null
+                    ? null
+                    : resultObj.toString();
         }
 
         protected Object toObject() {
             if (element.hasAttribute(attributeName)) {
-                return element.getAttribute(attributeName);
-            } else if (defaultValue == null) {
+                if (blankValue == null) {
+                    return element.getAttribute(attributeName);
+                } else {
+                    return StringUtils.defaultIfBlank(element.getAttribute(attributeName), blankValue.orElse(null));
+                }
+            } else if (defaultValue == null && blankValue == null) {
                 throw new IllegalArgumentException("Unknown attribute " + attributeName + " on node " + element.getNodeName() + ".");
-            } else if (defaultValue.isPresent()) {
-                return defaultValue.get();
             } else {
-                return null;
+                Object value = null;
+
+                if (defaultValue != null) {
+                    value = defaultValue.orElse(null);
+                }
+                if (blankValue != null) {
+                    value = StringUtils.defaultIfBlank(value == null ? null : value.toString(), blankValue.orElse(null));
+                }
+                return value;
             }
         }
 
-        public AttributeDSL ifNullDefault(String defaultValue) {
+        public AttributeDSL defaultIfNull(String defaultValue) {
             this.defaultValue = Optional.<Object>ofNullable(defaultValue);
             return this;
         }
 
-        public AttributeIntDSL ifNullDefault(Integer defaultValue) {
+        public AttributeIntDSL defaultIfBlank(Integer defaultValue) {
             this.defaultValue = Optional.<Object>ofNullable(defaultValue);
             return new AttributeIntDSL(this);
+        }
+
+        public AttributeDSL defaultIfBlank(String defaultValue) {
+            this.blankValue = Optional.ofNullable(defaultValue);
+            return this;
         }
     }
 
