@@ -1,6 +1,7 @@
 package za.co.no9.util;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -25,5 +26,49 @@ public class DOMUtils {
                 .newInstance()
                 .newDocumentBuilder()
                 .parse(inputSource);
+    }
+
+    public static ElementDSL from(String xmlString) throws SAXException {
+        return ElementDSL.from(create(xmlString).getDocumentElement());
+    }
+
+    public static class ElementDSL {
+        private final Element element;
+
+        public ElementDSL(Element element) {
+            this.element = element;
+        }
+
+        public static ElementDSL from(Element element) {
+            return new ElementDSL(element);
+        }
+
+        public AttributeDSL attribute(String attributeName) {
+            return AttributeDSL.create(element, attributeName);
+        }
+    }
+
+    public abstract static class AttributeDSL {
+        public static AttributeDSL create(Element element, String attributeName) {
+            return new AttributeElementDSL(element, attributeName);
+        }
+
+        public abstract String toString();
+    }
+
+    public static class AttributeElementDSL extends AttributeDSL {
+        private final Element element;
+        private final String attributeName;
+
+        public AttributeElementDSL(Element element, String attributeName) {
+            super();
+
+            this.element = element;
+            this.attributeName = attributeName;
+        }
+
+        public String toString() {
+            return element.getAttribute(attributeName);
+        }
     }
 }
