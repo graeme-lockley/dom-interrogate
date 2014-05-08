@@ -5,6 +5,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import za.co.no9.lang.Predicate;
+import za.co.no9.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -46,6 +48,19 @@ public class DOMUtils {
 
         public AttributeDSL attribute(String attributeName) {
             return AttributeDSL.create(element, attributeName);
+        }
+
+        public Stream<Element> children() {
+            return Stream.create(new NodeListIterator(element));
+        }
+
+        public Stream<Element> children(final String nodeName) {
+            return children().filter(new Predicate<Element>() {
+                @Override
+                public boolean test(Element element) {
+                    return element.getNodeName().equals(nodeName);
+                }
+            });
         }
     }
 

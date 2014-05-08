@@ -67,4 +67,22 @@ public class DOMUtilsTest {
                 .defaultIfBlank(123)
                 .toInteger().intValue());
     }
+
+    @Test
+    public void should_return_all_the_children_p_nodes() throws Exception {
+        assertEquals(2, DOMUtils.from(XML_STRING)
+                .children("p")
+                .count());
+
+        assertEquals(0, DOMUtils.from(XML_STRING)
+                .children("div")
+                .count());
+    }
+
+    @Test
+    public void should_return_all_child_nodes() throws Exception {
+        assertEquals(2, DOMUtils.from(XML_STRING)
+                .children()
+                .count());
+    }
 }
